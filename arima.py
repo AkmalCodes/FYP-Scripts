@@ -9,7 +9,7 @@ df = pd.read_csv('Reprocessed_SalesKaggle_Full.csv')
 df['Date'] = pd.to_datetime(df['Date'])
 
 # Aggregate monthly sales per SKU
-monthly_df = df.groupby(['SKU_number', pd.Grouper(key='Date', freq='M')])['SoldCount'].sum().reset_index()
+monthly_df = df.groupby(['SKU_number', pd.Grouper(key='Date', freq='ME')])['SoldCount'].sum().reset_index()
 
 # Filter SKUs with enough data
 sku_groups = monthly_df.groupby('SKU_number')
