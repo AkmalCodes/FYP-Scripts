@@ -5,14 +5,14 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.pyplot as plt
 
 # Load dataset
-df = pd.read_csv('Reprocessed_SalesKaggle_Full.csv')
-df['Date'] = pd.to_datetime(df['Date'])
+df = pd.read_csv('inventory_forecast_dataset.csv')
+df['created_at'] = pd.to_datetime(df['created_at'])
 
 # Aggregate monthly sales per SKU
-monthly_df = df.groupby(['SKU_number', pd.Grouper(key='Date', freq='ME')])['SoldCount'].sum().reset_index()
+monthly_df = df.groupby(['product_id', pd.Grouper(key='created_at', freq='ME')])['soldCount'].sum().reset_index()
 
 # Filter SKUs with enough data
-sku_groups = monthly_df.groupby('SKU_number')
+sku_groups = monthly_df.groupby('product_id')
 sku_metrics = []
 
 for sku, sku_data in sku_groups:
@@ -22,8 +22,8 @@ for sku, sku_data in sku_groups:
     if len(sku_data) < 24:
         continue
 
-    train = sku_data['SoldCount'].iloc[:-6]
-    test = sku_data['SoldCount'].iloc[-6:]
+    train = sku_data['soldCount'].iloc[:-6]
+    test = sku_data['soldCount'].iloc[-6:]
 
     try:
         # Fit ARIMA
@@ -41,7 +41,7 @@ for sku, sku_data in sku_groups:
         print("Model order:", model.order)
 
         sku_metrics.append({
-            'SKU_number': sku,
+            'product_id': sku,
             'MAE': mae,
             'RMSE': rmse,
             'MAPE': mape,
